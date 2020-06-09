@@ -21,7 +21,9 @@ import com.hazelcast.logging.ILogger;
 import com.hazelcast.spi.discovery.DiscoveryNode;
 import com.hazelcast.spi.discovery.DiscoveryStrategy;
 import com.hazelcast.spi.discovery.DiscoveryStrategyFactory;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -66,5 +68,16 @@ public class HazelcastKubernetesDiscoveryStrategyFactory
 
     public Collection<PropertyDefinition> getConfigurationProperties() {
         return PROPERTY_DEFINITIONS;
+    }
+
+    @Override
+    @SuppressFBWarnings("DMI_HARDCODED_ABSOLUTE_FILENAME")
+    public boolean isApplicableToCurrentEnvironment() {
+        return new File("/var/run/secrets/kubernetes.io/serviceaccount/token").exists();
+    }
+
+    @Override
+    public DiscoveryStrategyLevel discoveryStrategyLevel() {
+        return DiscoveryStrategyLevel.PLATFORM;
     }
 }
